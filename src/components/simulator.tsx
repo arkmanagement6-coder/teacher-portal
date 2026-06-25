@@ -1,0 +1,268 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { DbClient, Payment, Fee, WhatsAppLog } from '@/lib/db';
+import { useClient } from './client-provider';
+import { Zap, Play, CheckCircle, RefreshCw, X, MessageSquare, AlertCircle } from 'lucide-react';
+
+export function SimulatorPanel() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'payments' | 'whatsapp' | 'actions'>('payments');
+  const [pendingPayments, setPendingPayments] = useState<Payment[]>([]);
+  const [logs, setLogs] = useState<WhatsAppLog[]>([]);
+  const { showToast, user } = useClient();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const interval = setInterval(() => {
+      loadSimulatorData();
+    }, 2000);
+
+    loadSimulatorData();
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
+  const loadSimulatorData = async () => {
+    const academy = await DbClient.getAcademy();
+    if (!academy) return;
+
+    // Get all pending payments
+    const pays = await DbClient.getPayments(academy.id);
+    setPendingPayments(pays.filter(p => p.status === 'pending'));
+
+    // Get latest WhatsApp logs
+    const wlogs = await DbClient.getWhatsAppLogs(academy.id);
+    setLogs(wlogs.slice(0, 10)); // Top 10
+  };
+
+  const handleSimulatePayment = async (pay: Payment) => {
+    try {
+      const randomPayId = 'pay_sim_' + Math.random().toString(36).substr(2, 9);
+      const methods = ['UPI', 'Card', 'Netbanking', 'Wallet'];
+      const chosenMethod = methods[Math.floor(Math.random() * methods.length)];
+      
+      await DbClient.completePayment(pay.id, randomPayId, chosenMethod);
+      
+      // Also send a payment success WhatsApp message automatically
+      const academy = await DbClient.getAcademy();
+      if (academy) {
+        // Find student name from payments database
+        const students = await DbClient.getStudents(academy.id);
+        const fee = (await DbClient.getFees(academy.id)).find(f => f.id === pay.fee_id);
+        const student = fee ? students.find(s => s.id === fee.student_id) : null;
+        
+        if (student) {
+          await DbClient.triggerWhatsAppReminder(
+            academy.id,
+            student.id,
+            'payment_success',
+            `Thank you! We have received your payment of ₹${pay.amount} for ${student.name}.`
+          );
+        }
+      }
+
+      showToast(`Payment of ₹${pay.amount} processed successfully via ${chosenMethod}!`, 'success');
+      loadSimulatorData();
+    } catch (err: any) {
+      showToast(err.message || 'Payment simulation failed', 'error');
+    }
+  };
+
+  const triggerDailyAutomations = async () => {
+    const academy = await DbClient.getAcademy();
+    if (!academy) return;
+
+    const feesList = await DbClient.getFees(academy.id);
+    const students = await DbClient.getStudents(academy.id);
+    let count = 0;
+
+    for (const f of feesList) {
+      const student = students.find(s => s.id === f.student_id);
+      if (!student || student.status !== 'active') continue;
+
+      const dueDateObj = new Date(f.due_date);
+      const today = new Date();
+      const diffTime = dueDateObj.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      // Simulate sending notifications based on schedule
+      if (f.status === 'pending') {
+        if (diffDays === 7 || diffDays === 3 || diffDays === 0) {
+          await DbClient.triggerWhatsAppReminder(academy.id, student.id, 'due_reminder');
+          count++;
+        }
+      } else if (f.status === 'overdue' || f.status === 'partially_paid') {
+        const daysOverdue = Math.abs(diffDays);
+        if (daysOverdue === 3 || daysOverdue === 7 || daysOverdue > 0) {
+          await DbClient.triggerWhatsAppReminder(academy.id, student.id, 'overdue_reminder');
+          count++;
+        }
+      }
+    }
+
+    showToast(`Scheduler run complete! Sent ${count} automated WhatsApp reminders.`, 'success');
+    loadSimulatorData();
+  };
+
+  if (!user) return null; // Only show simulator if logged in
+
+  return (
+    <div className="fixed bottom-6 left-6 z-50">
+      {/* Floating Action Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-4 py-3 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all border border-white/20 font-semibold"
+      >
+        <Zap className={`w-5 h-5 ${isOpen ? 'animate-spin' : 'animate-pulse'}`} />
+        <span>{isOpen ? 'Close Simulator' : 'Playground Simulator'}</span>
+      </button>
+
+      {/* Simulator Drawer Panel */}
+      {isOpen && (
+        <div className="absolute bottom-16 left-0 w-96 max-w-sm rounded-2xl glass-panel text-white shadow-2xl overflow-hidden border border-white/10 animate-fade-in flex flex-col h-[480px]">
+          {/* Header */}
+          <div className="p-4 bg-zinc-900/90 border-b border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-violet-400" />
+              <h3 className="font-bold text-sm text-zinc-100">B2B Integration Simulator</h3>
+            </div>
+            <button onClick={() => setIsOpen(false)} className="text-zinc-400 hover:text-white transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="flex bg-zinc-950/60 p-1 border-b border-white/5 text-xs">
+            <button
+              onClick={() => setActiveTab('payments')}
+              className={`flex-1 py-2 text-center rounded-md transition-colors ${activeTab === 'payments' ? 'bg-violet-600/30 text-violet-200 border border-violet-500/20 font-medium' : 'text-zinc-400 hover:text-zinc-200'}`}
+            >
+              Razorpay Links ({pendingPayments.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('whatsapp')}
+              className={`flex-1 py-2 text-center rounded-md transition-colors ${activeTab === 'whatsapp' ? 'bg-violet-600/30 text-violet-200 border border-violet-500/20 font-medium' : 'text-zinc-400 hover:text-zinc-200'}`}
+            >
+              WhatsApp API Outbox
+            </button>
+            <button
+              onClick={() => setActiveTab('actions')}
+              className={`flex-1 py-2 text-center rounded-md transition-colors ${activeTab === 'actions' ? 'bg-violet-600/30 text-violet-200 border border-violet-500/20 font-medium' : 'text-zinc-400 hover:text-zinc-200'}`}
+            >
+              Instant Triggers
+            </button>
+          </div>
+
+          {/* Content Area */}
+          <div className="flex-1 overflow-y-auto p-4 bg-zinc-900/40">
+            {activeTab === 'payments' && (
+              <div className="space-y-3">
+                <p className="text-xs text-zinc-400 mb-2">
+                  When you create invoices or copy payment links, they register here as active transaction tunnels. Simulate a parent completing their online payment:
+                </p>
+                {pendingPayments.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
+                    <CheckCircle className="w-8 h-8 text-zinc-600" />
+                    <p className="text-sm text-zinc-500">No active pending checkout sessions found.</p>
+                    <p className="text-[10px] text-zinc-600">Create an invoice or trigger payment link generation in Fee Management.</p>
+                  </div>
+                ) : (
+                  pendingPayments.map(p => (
+                    <div key={p.id} className="p-3 rounded-lg bg-zinc-950/60 border border-white/5 flex items-center justify-between text-xs hover:border-violet-500/30 transition-all">
+                      <div>
+                        <div className="font-semibold text-zinc-200">{p.student_name || 'Chess Student'}</div>
+                        <div className="text-[10px] text-zinc-400">Order ID: {p.razorpay_order_id}</div>
+                        <div className="mt-1 text-emerald-400 font-semibold text-sm">₹{p.amount}</div>
+                      </div>
+                      <button
+                        onClick={() => handleSimulatePayment(p)}
+                        className="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-md flex items-center gap-1 font-medium transition-colors"
+                      >
+                        <Play className="w-3 h-3 fill-emerald-300" />
+                        <span>Pay Link</span>
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {activeTab === 'whatsapp' && (
+              <div className="space-y-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs text-zinc-400">Live API logs filtered by status:</span>
+                  <button onClick={loadSimulatorData} className="text-violet-400 hover:text-violet-300">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin-hover" />
+                  </button>
+                </div>
+                {logs.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
+                    <MessageSquare className="w-8 h-8 text-zinc-600" />
+                    <p className="text-sm text-zinc-500">WhatsApp outbox logs are currently empty.</p>
+                  </div>
+                ) : (
+                  logs.map(log => (
+                    <div key={log.id} className="p-2.5 rounded-lg bg-zinc-950/60 border border-white/5 text-xs hover:bg-zinc-950/80 transition-all">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-bold text-zinc-300">{log.student_name}</span>
+                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
+                          log.status === 'delivered' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                        }`}>
+                          {log.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-zinc-400 text-ellipsis overflow-hidden line-clamp-2">
+                        {log.type === 'payment_success' ? '💳 Payment Receipt Alert' : 
+                         log.type === 'due_reminder' ? '📅 Monthly Fee Due Reminder' : 
+                         log.type === 'overdue_reminder' ? '🚨 Overdue Defaulter Warning' : 
+                         log.type === 'attendance_alert' ? '📝 Absent Attendance Alert' : '🔔 System Notification'}
+                      </div>
+                      <div className="text-[9px] text-zinc-500 mt-1 flex justify-between">
+                        <span>Recipient: {log.sent_to}</span>
+                        <span>{new Date(log.sent_at).toLocaleTimeString()}</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {activeTab === 'actions' && (
+              <div className="space-y-4">
+                <p className="text-xs text-zinc-400">
+                  Simulate core background operations that occur automatically on the production cron scheduler:
+                </p>
+
+                <div className="space-y-2">
+                  <button
+                    onClick={triggerDailyAutomations}
+                    className="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs border border-violet-500/20 transition-all active:scale-95"
+                  >
+                    <Zap className="w-4 h-4 fill-white" />
+                    <span>Run Daily Automation Engine</span>
+                  </button>
+                  <p className="text-[10px] text-zinc-500 leading-normal">
+                    Scans all active invoices. Automatically fires WhatsApp reminders for students with due dates matching 7 days before, 3 days after, or overdue milestones.
+                  </p>
+                </div>
+
+                <div className="h-px bg-white/5 my-4" />
+
+                <div className="p-3 bg-zinc-950/60 border border-white/5 rounded-xl text-[10px] text-zinc-400 flex gap-2">
+                  <AlertCircle className="w-5 h-5 text-violet-400 flex-shrink-0" />
+                  <div className="leading-relaxed">
+                    <strong className="text-zinc-300 block mb-0.5">Mock Auth Credentials:</strong>
+                    Owner: <code className="text-zinc-200">owner@test.com</code> / <code className="text-zinc-200">password123</code><br/>
+                    Teacher: <code className="text-zinc-200">teacher@test.com</code> / <code className="text-zinc-200">password123</code><br/>
+                    Super Admin: <code className="text-zinc-200">admin@test.com</code> / <code className="text-zinc-200">password123</code>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
