@@ -1,53 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #09090b;
-  --popover-foreground: #fafafa;
-  --primary: #8b5cf6;
+  --background: #ffffff;
+  --foreground: #0f172a; /* Slate 900 */
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #2563eb; /* Royal Blue */
   --primary-foreground: #ffffff;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #8b5cf6;
+  --secondary: #ea580c; /* Vivid Orange */
+  --secondary-foreground: #ffffff;
+  --muted: #f1f5f9; /* Slate 100 */
+  --muted-foreground: #64748b; /* Slate 500 */
+  --accent: #2563eb;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
-  --ring: #d8b4fe;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0; /* Slate 200 */
+  --input: #e2e8f0;
+  --ring: #93c5fd; /* Blue 300 */
   
   --emerald: #10b981;
   --amber: #f59e0b;
   --rose: #f43f5e;
 }
 
-.light-theme {
-  --background: #fcfcfd;
-  --foreground: #09090b;
-  --card: #ffffff;
-  --card-foreground: #09090b;
-  --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #7c3aed;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #09090b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #7c3aed;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #fafafa;
-  --border: #e4e4e7;
-  --input: #e4e4e7;
-  --ring: #c084fc;
-}
-
+/* Maintain a unified theme variables config */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -75,20 +54,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Glassmorphism utility */
+/* Glassmorphism utility updated for premium white/light theme styling */
 .glass-panel {
-  background: rgba(24, 24, 27, 0.65);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.12); /* slate-400 with opacity */
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 8px -1px rgba(15, 23, 42, 0.02);
 }
 
-.light-theme .glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-/* Custom Scrollbar */
+/* Custom Scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -97,7 +71,7 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: #cbd5e1; /* slate-300 */
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {

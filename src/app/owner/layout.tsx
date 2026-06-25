@@ -48,23 +48,23 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   if (!user || user.role !== 'owner') return null;
 
   return (
-    <div className="min-h-screen bg-[#070708] text-zinc-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col md:flex-row">
       
       {/* Sidebar Navigation */}
-      <aside className="hidden md:flex flex-col w-64 bg-zinc-950 border-r border-white/5 flex-shrink-0">
+      <aside className="hidden md:flex flex-col w-64 bg-white border-r border-slate-200 flex-shrink-0">
         
         {/* Logo and Academy Header */}
-        <div className="p-6 border-b border-white/5 space-y-3">
+        <div className="p-6 border-b border-slate-100 space-y-3">
           <div className="flex items-center gap-2">
-            <div className="bg-violet-600 p-1.5 rounded-lg text-white shadow-[0_0_12px_#8b5cf6]">
+            <div className="bg-blue-600 p-1.5 rounded-lg text-white shadow-sm shadow-blue-500/20">
               <Zap className="w-4.5 h-4.5 fill-white" />
             </div>
-            <span className="font-extrabold text-sm tracking-tight text-white">Remind<span className="text-violet-400">Flow</span></span>
+            <span className="font-extrabold text-sm tracking-tight text-slate-900">Remind<span className="text-orange-500">Flow</span></span>
           </div>
           {academy && (
-            <div className="p-2.5 rounded-xl bg-zinc-900/60 border border-white/5">
-              <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Academy Workspace</span>
-              <span className="text-xs font-bold text-zinc-200 block truncate mt-0.5">{academy.name}</span>
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Academy Workspace</span>
+              <span className="text-xs font-bold text-slate-700 block truncate mt-0.5">{academy.name}</span>
             </div>
           )}
         </div>
@@ -79,8 +79,8 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
                 href={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium transition-all ${
                   isActive 
-                    ? 'bg-violet-600/10 text-violet-300 border border-violet-500/20 font-bold shadow-[0_2px_10px_rgba(139,92,246,0.05)]' 
-                    : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900/50'
+                    ? 'bg-blue-50 text-blue-600 border border-blue-100 font-bold' 
+                    : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50/50'
                 }`}
               >
                 {item.icon}
@@ -91,26 +91,25 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* User profile footer */}
-        <div className="p-4 border-t border-white/5 bg-zinc-950/80 space-y-4">
-          
-          <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-[10px] font-bold uppercase tracking-wider">Mode</span>
+        <div className="p-4 border-t border-slate-100 bg-white space-y-4">
+          <div className="flex items-center justify-between text-slate-500">
+            <span className="text-[10px] font-bold uppercase tracking-wider">Theme Mode</span>
             <button 
               onClick={toggleTheme} 
-              className="p-1.5 rounded-lg bg-zinc-900 border border-white/5 text-zinc-300 hover:text-white transition-colors"
+              className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-blue-600 transition-colors"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
           </div>
 
-          <div className="flex items-center justify-between bg-zinc-900/50 p-2.5 rounded-xl border border-white/5">
+          <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100">
             <div className="truncate pr-2">
-              <div className="text-xs font-bold text-zinc-200 truncate">{user.name}</div>
-              <div className="text-[9px] text-zinc-500 uppercase tracking-widest mt-0.5">{user.role}</div>
+              <div className="text-xs font-bold text-slate-800 truncate">{user.name}</div>
+              <div className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5">{user.role}</div>
             </div>
             <button 
               onClick={logout} 
-              className="text-rose-400 hover:text-rose-300 p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/20 hover:scale-105 active:scale-95 transition-all"
+              className="text-rose-600 hover:text-rose-500 p-1.5 rounded-lg bg-rose-50 border border-rose-100 hover:scale-105 active:scale-95 transition-all"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -119,24 +118,24 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Mobile Nav Header */}
-      <header className="md:hidden bg-zinc-950 border-b border-white/5 p-4 flex items-center justify-between z-20">
+      <header className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between z-20">
         <div className="flex items-center gap-2">
-          <div className="bg-violet-600 p-1.5 rounded-lg text-white">
+          <div className="bg-blue-600 p-1.5 rounded-lg text-white">
             <Zap className="w-4 h-4 fill-white" />
           </div>
-          <span className="font-extrabold text-sm tracking-tight text-white">Remind<span className="text-violet-400">Flow</span></span>
+          <span className="font-extrabold text-sm tracking-tight text-slate-900">Remind<span className="text-orange-500">Flow</span></span>
         </div>
 
         <div className="flex items-center gap-3">
           <button 
             onClick={toggleTheme} 
-            className="p-1.5 rounded-lg bg-zinc-900 border border-white/5 text-zinc-300"
+            className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
-            className="p-2 bg-zinc-900 border border-white/5 rounded-xl text-zinc-400 hover:text-white"
+            className="p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 hover:text-slate-700"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -145,7 +144,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-[#070708]/95 backdrop-blur-md pt-20 px-6 flex flex-col justify-between pb-10">
+        <div className="md:hidden fixed inset-0 z-30 bg-white/95 backdrop-blur-md pt-20 px-6 flex flex-col justify-between pb-10 text-slate-800">
           <nav className="space-y-2">
             {navItems.map((item, idx) => {
               const isActive = pathname === item.path;
@@ -155,7 +154,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
                   href={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-semibold ${
-                    isActive ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-zinc-200 bg-zinc-900/40 border border-white/5'
+                    isActive ? 'bg-blue-600 text-white shadow-md' : 'text-slate-600 hover:text-blue-600 bg-slate-50 border border-slate-100'
                   }`}
                 >
                   {item.icon}
@@ -166,10 +165,10 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
           </nav>
 
           <div className="space-y-4">
-            <div className="p-3 bg-zinc-900/60 rounded-xl border border-white/5 flex items-center justify-between">
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold text-zinc-200">{user.name}</div>
-                <div className="text-[9px] text-zinc-500">{user.role}</div>
+                <div className="text-xs font-bold text-slate-800">{user.name}</div>
+                <div className="text-[9px] text-slate-400">{user.role}</div>
               </div>
               <button 
                 onClick={() => { setMobileMenuOpen(false); logout(); }} 

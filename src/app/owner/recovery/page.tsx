@@ -47,15 +47,13 @@ export default function RecoveryDashboard() {
     const items: Defaulter[] = [];
 
     fees.forEach(f => {
-      // Find remaining balance
       const balance = Number(f.amount) - Number(f.paid_amount);
-      if (balance <= 0) return; // ignore fully paid
+      if (balance <= 0) return;
 
       const dueDateObj = new Date(f.due_date);
       const diffTime = today.getTime() - dueDateObj.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
-      // Accumulate totals
       totalDue += balance;
       
       let isOverdue = false;
@@ -68,8 +66,6 @@ export default function RecoveryDashboard() {
 
       if (f.status === 'overdue' || isOverdue) {
         const student = students.find(s => s.id === f.student_id);
-        
-        // Find last whatsapp log for this student
         const lastLog = logs.find(l => l.student_id === f.student_id && l.type === 'overdue_reminder');
         
         items.push({
@@ -86,7 +82,6 @@ export default function RecoveryDashboard() {
       }
     });
 
-    // Sort by highest due amount
     items.sort((a, b) => b.dueAmount - a.dueAmount);
 
     setDefaulters(items);
@@ -122,7 +117,6 @@ export default function RecoveryDashboard() {
   };
 
   const handleCallParent = (def: Defaulter) => {
-    // Simulate placing phone call
     showToast(`Opening dialer / Logging call to ${def.parentName} (${def.mobile})`, 'info');
   };
 
@@ -136,15 +130,12 @@ export default function RecoveryDashboard() {
     }
   };
 
-  // Filter conditions
   const filtered = defaulters.filter(d => {
-    // Search filter
     const matchesSearch = d.studentName.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           d.parentName.toLowerCase().includes(searchQuery.toLowerCase());
     
     if (!matchesSearch) return false;
 
-    // Range filter
     if (filterRange === 'all') return true;
     if (filterRange === '1-7') return d.daysOverdue >= 1 && d.daysOverdue <= 7;
     if (filterRange === '7-15') return d.daysOverdue > 7 && d.daysOverdue <= 15;
@@ -157,77 +148,77 @@ export default function RecoveryDashboard() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px] gap-2">
-        <div className="w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-zinc-500 text-xs">Generating recovery logs...</p>
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-slate-500 text-xs">Generating recovery logs...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in text-slate-800">
       
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-white">Recovery Dashboard</h1>
-        <p className="text-xs text-zinc-400">Track defaulter invoice aging and execute direct collection triggers</p>
+        <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">Recovery Dashboard</h1>
+        <p className="text-xs text-slate-500">Track defaulter invoice aging and execute direct collection triggers</p>
       </div>
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
         {/* Total Pending */}
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 flex items-center gap-4 bg-amber-500/5">
-          <div className="bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 text-amber-400">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 bg-white flex items-center gap-4 shadow-sm bg-orange-50/20">
+          <div className="bg-orange-50 p-3 rounded-xl border border-orange-200 text-orange-600">
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Total Outstanding Due</span>
-            <h3 className="text-xl font-extrabold text-white mt-1">₹{totals.dueAmount}</h3>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Total Outstanding Due</span>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1">₹{totals.dueAmount}</h3>
           </div>
         </div>
 
         {/* Total Overdue */}
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 flex items-center gap-4 bg-rose-500/5">
-          <div className="bg-rose-500/10 p-3 rounded-xl border border-rose-500/20 text-rose-400">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 bg-white flex items-center gap-4 shadow-sm bg-rose-50/20">
+          <div className="bg-rose-50 p-3 rounded-xl border border-rose-100 text-rose-600">
             <AlertTriangle className="w-6 h-6 animate-pulse" />
           </div>
           <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Total Overdue (Defaulter)</span>
-            <h3 className="text-xl font-extrabold text-white mt-1">₹{totals.overdueAmount}</h3>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Total Overdue (Defaulter)</span>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1">₹{totals.overdueAmount}</h3>
           </div>
         </div>
 
         {/* Defaulter count */}
-        <div className="glass-panel p-5 rounded-2xl border border-white/10 flex items-center gap-4">
-          <div className="bg-violet-600/10 p-3 rounded-xl border border-violet-500/20 text-violet-400 font-extrabold text-lg w-12 h-12 flex items-center justify-center">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 bg-white flex items-center gap-4 shadow-sm">
+          <div className="bg-blue-50 border border-blue-100 p-3 rounded-xl text-blue-600 font-extrabold text-lg w-12 h-12 flex items-center justify-center">
             {totals.count}
           </div>
           <div>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider block">Active Defaulters</span>
-            <h3 className="text-xl font-extrabold text-white mt-1">Students pending payment</h3>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Active Defaulters</span>
+            <h3 className="text-xl font-extrabold text-slate-900 mt-1">Pending student profiles</h3>
           </div>
         </div>
 
       </div>
 
       {/* Filters and Actions Row */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-zinc-950 p-4 rounded-2xl border border-white/5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         
         {/* Search */}
-        <div className="flex items-center gap-2 bg-zinc-900 px-3 py-2 rounded-xl border border-white/5 w-full sm:max-w-xs">
-          <Search className="w-4 h-4 text-zinc-500" />
+        <div className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-xl border border-slate-200/60 w-full sm:max-w-xs">
+          <Search className="w-4 h-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search student or parent..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent text-xs text-white focus:outline-none placeholder-zinc-500"
+            className="w-full bg-transparent text-xs text-slate-800 focus:outline-none placeholder-slate-400"
           />
         </div>
 
         {/* Time filters */}
         <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold">
-          <span className="text-zinc-500 mr-1.5 flex items-center gap-1"><Filter className="w-3.5 h-3.5" /> Aging filter:</span>
+          <span className="text-slate-400 mr-1.5 flex items-center gap-1"><Filter className="w-3.5 h-3.5" /> Aging filter:</span>
           {[
             { id: 'all', label: 'All Overdue' },
             { id: '1-7', label: '1 - 7 Days' },
@@ -240,8 +231,8 @@ export default function RecoveryDashboard() {
               onClick={() => setFilterRange(opt.id as any)}
               className={`px-3 py-1.5 rounded-lg border transition-all ${
                 filterRange === opt.id 
-                  ? 'bg-violet-600 border-violet-500 text-white shadow-md' 
-                  : 'bg-zinc-900 border-white/5 text-zinc-400 hover:text-zinc-200'
+                  ? 'bg-blue-600 border-blue-500 text-white shadow-sm' 
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-blue-600'
               }`}
             >
               {opt.label}
@@ -252,11 +243,11 @@ export default function RecoveryDashboard() {
       </div>
 
       {/* Defaulter Table */}
-      <div className="glass-panel rounded-2xl border border-white/10 overflow-hidden">
+      <div className="glass-panel rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-zinc-950 border-b border-white/5 text-zinc-400 font-bold uppercase tracking-wider text-[10px]">
+              <tr className="bg-slate-50 border-b border-slate-100 text-slate-500 font-bold uppercase tracking-wider text-[10px]">
                 <th className="p-4">Student Name</th>
                 <th className="p-4">Parent Name</th>
                 <th className="p-4">Amount Due</th>
@@ -265,34 +256,34 @@ export default function RecoveryDashboard() {
                 <th className="p-4 text-right">Recovery Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5 text-zinc-300">
+            <tbody className="divide-y divide-slate-100 text-slate-700 bg-white">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-zinc-500 italic">No defaulters match the active filters.</td>
+                  <td colSpan={6} className="p-8 text-center text-slate-450 italic">No defaulters match the active filters.</td>
                 </tr>
               ) : (
                 filtered.map((def, idx) => (
-                  <tr key={idx} className="hover:bg-zinc-900/10 transition-colors">
-                    <td className="p-4 font-bold text-zinc-200">{def.studentName}</td>
-                    <td className="p-4 text-zinc-400">{def.parentName}</td>
-                    <td className="p-4 font-bold text-rose-400">₹{def.dueAmount}</td>
+                  <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                    <td className="p-4 font-bold text-slate-800">{def.studentName}</td>
+                    <td className="p-4 text-slate-500">{def.parentName}</td>
+                    <td className="p-4 font-bold text-rose-600">₹{def.dueAmount}</td>
                     <td className="p-4">
                       <span className={`px-2 py-0.5 rounded text-[9px] font-bold border ${
-                        def.daysOverdue > 30 ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
-                        def.daysOverdue > 15 ? 'bg-orange-500/10 text-orange-500 border-orange-500/20' : 
-                        'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                        def.daysOverdue > 30 ? 'bg-red-50 text-red-650 border-red-100' : 
+                        def.daysOverdue > 15 ? 'bg-orange-50 text-orange-600 border-orange-100' : 
+                        'bg-amber-50 text-amber-600 border-amber-100'
                       }`}>
                         {def.daysOverdue} days
                       </span>
                     </td>
-                    <td className="p-4 text-zinc-400">{def.lastReminderDate}</td>
+                    <td className="p-4 text-slate-500">{def.lastReminderDate}</td>
                     <td className="p-4 text-right flex justify-end gap-1.5">
                       
                       {/* WhatsApp Reminder */}
                       <button
                         onClick={() => handleSendReminder(def)}
                         title="Send WhatsApp alert"
-                        className="bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg transition-colors"
+                        className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-100 p-2 rounded-lg transition-colors"
                       >
                         <MessageSquare className="w-4 h-4" />
                       </button>
@@ -301,7 +292,7 @@ export default function RecoveryDashboard() {
                       <button
                         onClick={() => handleCallParent(def)}
                         title="Call Parent"
-                        className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 p-2 rounded-lg transition-colors"
+                        className="bg-blue-50 hover:bg-blue-100 text-blue-650 border border-blue-100 p-2 rounded-lg transition-colors"
                       >
                         <PhoneCall className="w-4 h-4" />
                       </button>
@@ -310,7 +301,7 @@ export default function RecoveryDashboard() {
                       <button
                         onClick={() => handleMarkPaid(def.feeId, def.dueAmount)}
                         title="Mark invoice paid"
-                        className="bg-violet-600/10 hover:bg-violet-600/20 text-violet-300 border border-violet-500/20 p-2 rounded-lg transition-colors"
+                        className="bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-100 p-2 rounded-lg transition-colors"
                       >
                         <CheckSquare className="w-4 h-4" />
                       </button>
