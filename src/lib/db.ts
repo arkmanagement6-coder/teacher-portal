@@ -19,6 +19,12 @@ export interface Academy {
   owner_id?: string;
   razorpay_key_id?: string;
   razorpay_secret?: string;
+  upi_id?: string;
+  qr_code_url?: string;
+  bank_name?: string;
+  bank_account_no?: string;
+  bank_ifsc?: string;
+  bank_holder_name?: string;
   whatsapp_enabled: boolean;
   whatsapp_settings: {
     phoneNumberId?: string;
@@ -71,6 +77,9 @@ export interface Fee {
   due_date: string; // YYYY-MM-DD
   billing_cycle: string;
   status: 'paid' | 'pending' | 'overdue' | 'partially_paid';
+  screenshot_url?: string;
+  screenshot_status?: 'pending_verification' | 'approved' | 'rejected' | 'need_reupload';
+  screenshot_uploaded_at?: string;
   created_at: string;
 }
 
@@ -134,6 +143,12 @@ const MOCK_ACADEMIES: Academy[] = [
     owner_id: 'usr-owner',
     razorpay_key_id: 'rzp_test_keys1234',
     razorpay_secret: 'sec_test_secret5678',
+    upi_id: 'apexchess@upi',
+    qr_code_url: 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=apexchess@upi%26pn=Apex%20Chess%20Academy%26am=1500%26cu=INR',
+    bank_name: 'State Bank of India',
+    bank_account_no: '30294857601',
+    bank_ifsc: 'SBIN0001024',
+    bank_holder_name: 'Apex Chess Academy Private Limited',
     whatsapp_enabled: true,
     whatsapp_settings: { phoneNumberId: '10984723984', accessToken: 'EAAd7fghd...' },
     resend_api_key: 're_7sd6fg...',
@@ -253,7 +268,7 @@ const MOCK_STUDENTS: Student[] = [
 
 const MOCK_FEES: Fee[] = [
   // Aarav: Overdue fee (June 2026) & Pending (July 2026) - assuming we are on June 25, 2026
-  { id: 'fee-1', student_id: 'std-1', academy_id: 'acad-1', amount: 1500, paid_amount: 0, due_date: '2026-06-05', billing_cycle: 'monthly', status: 'overdue', created_at: '2026-06-01T00:00:00Z' },
+  { id: 'fee-1', student_id: 'std-1', academy_id: 'acad-1', amount: 1500, paid_amount: 0, due_date: '2026-06-05', billing_cycle: 'monthly', status: 'overdue', screenshot_url: 'https://images.unsplash.com/photo-1616077168712-fc6c788bc4ee?auto=format&fit=crop&q=80&w=600', screenshot_status: 'pending_verification', screenshot_uploaded_at: '2026-06-25T10:00:00Z', created_at: '2026-06-01T00:00:00Z' },
   // Isha: Paid (June 2026)
   { id: 'fee-2', student_id: 'std-2', academy_id: 'acad-1', amount: 1500, paid_amount: 1500, due_date: '2026-06-05', billing_cycle: 'monthly', status: 'paid', created_at: '2026-06-01T00:00:00Z' },
   // Kabir: Paid (June 2026)
@@ -261,7 +276,7 @@ const MOCK_FEES: Fee[] = [
   // Riya: Pending (June 2026) - since it is due on 10th and status is pending (needs manual followup or overdue soon)
   { id: 'fee-4', student_id: 'std-4', academy_id: 'acad-1', amount: 2000, paid_amount: 0, due_date: '2026-06-10', billing_cycle: 'monthly', status: 'overdue', created_at: '2026-06-01T00:00:00Z' },
   // Vihaan: Overdue (May 2026) & Overdue (June 2026)
-  { id: 'fee-5', student_id: 'std-5', academy_id: 'acad-1', amount: 1500, paid_amount: 0, due_date: '2026-05-05', billing_cycle: 'monthly', status: 'overdue', created_at: '2026-05-01T00:00:00Z' },
+  { id: 'fee-5', student_id: 'std-5', academy_id: 'acad-1', amount: 1500, paid_amount: 0, due_date: '2026-05-05', billing_cycle: 'monthly', status: 'overdue', screenshot_url: 'https://images.unsplash.com/photo-1554415707-6e8cfc93fe23?auto=format&fit=crop&q=80&w=600', screenshot_status: 'pending_verification', screenshot_uploaded_at: '2026-06-26T14:30:00Z', created_at: '2026-05-01T00:00:00Z' },
   { id: 'fee-6', student_id: 'std-5', academy_id: 'acad-1', amount: 1500, paid_amount: 500, due_date: '2026-06-05', billing_cycle: 'monthly', status: 'partially_paid', created_at: '2026-06-01T00:00:00Z' },
   // Diya: Paid (June 2026)
   { id: 'fee-7', student_id: 'std-6', academy_id: 'acad-1', amount: 3000, paid_amount: 3000, due_date: '2026-06-15', billing_cycle: 'monthly', status: 'paid', created_at: '2026-06-01T00:00:00Z' }
@@ -630,6 +645,15 @@ export class DbClient {
       store.fees[idx].paid_amount = paidAmount;
     }
     
+    this.saveStore(store);
+    return store.fees[idx];
+  }
+
+  static async updateFee(feeId: string, updates: Partial<Fee>): Promise<Fee> {
+    const store = this.getStore();
+    const idx = store.fees.findIndex(f => f.id === feeId);
+    if (idx === -1) throw new Error('Fee record not found');
+    store.fees[idx] = { ...store.fees[idx], ...updates };
     this.saveStore(store);
     return store.fees[idx];
   }

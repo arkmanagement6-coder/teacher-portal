@@ -36,13 +36,13 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { name: 'Dashboard', path: '/owner', icon: <LayoutDashboard className="w-4.5 h-4.5" /> },
     { name: 'Students', path: '/owner/students', icon: <Users className="w-4.5 h-4.5" /> },
-    { name: 'Batches', path: '/owner/batches', icon: <Clock className="w-4.5 h-4.5" /> },
+    { name: 'Fee Recovery', path: '/owner/recovery', icon: <BarChart3 className="w-4.5 h-4.5 text-blue-600 font-extrabold" /> },
+    { name: 'Payments', path: '/owner/fees', icon: <CreditCard className="w-4.5 h-4.5" /> },
+    { name: 'Attendance', path: '/owner/scanner', icon: <Zap className="w-4.5 h-4.5 text-orange-500" /> },
     { name: 'Teachers', path: '/owner/teachers', icon: <ShieldCheck className="w-4.5 h-4.5" /> },
-    { name: 'Fee Management', path: '/owner/fees', icon: <CreditCard className="w-4.5 h-4.5" /> },
-    { name: 'Recovery Board', path: '/owner/recovery', icon: <BarChart3 className="w-4.5 h-4.5" /> },
-    { name: 'WhatsApp API', path: '/owner/whatsapp', icon: <MessageSquare className="w-4.5 h-4.5" /> },
+    { name: 'Batches', path: '/owner/batches', icon: <Clock className="w-4.5 h-4.5" /> },
     { name: 'Reports', path: '/owner/reports', icon: <BarChart3 className="w-4.5 h-4.5" /> },
-    { name: 'Attendance Scanner', path: '/owner/scanner', icon: <Zap className="w-4.5 h-4.5 text-orange-500" /> },
+    { name: 'Automation', path: '/owner/whatsapp', icon: <MessageSquare className="w-4.5 h-4.5" /> },
     { name: 'Settings', path: '/owner/settings', icon: <Settings className="w-4.5 h-4.5" /> }
   ];
 

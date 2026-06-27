@@ -50,9 +50,13 @@ export default function SetupWizard() {
   const [editDueDate, setEditDueDate] = useState('');
   const [editJoiningDate, setEditJoiningDate] = useState('');
 
-  // Step 4: Razorpay Connect
-  const [rzpKey, setRzpKey] = useState('');
-  const [rzpSecret, setRzpSecret] = useState('');
+  // Step 4: Direct Payment Setup
+  const [upiId, setUpiId] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [bankAccountNo, setBankAccountNo] = useState('');
+  const [bankIfsc, setBankIfsc] = useState('');
+  const [bankHolderName, setBankHolderName] = useState('');
 
   // Step 5: WhatsApp Connect
   const [waPhoneId, setWaPhoneId] = useState('');
@@ -70,8 +74,12 @@ export default function SetupWizard() {
         setName(acad.name || '');
         setAddress(acad.address || '');
         setLogo(acad.logo_url || '');
-        setRzpKey(acad.razorpay_key_id || '');
-        setRzpSecret(acad.razorpay_secret || '');
+        setUpiId(acad.upi_id || '');
+        setQrCodeUrl(acad.qr_code_url || '');
+        setBankName(acad.bank_name || '');
+        setBankAccountNo(acad.bank_account_no || '');
+        setBankIfsc(acad.bank_ifsc || '');
+        setBankHolderName(acad.bank_holder_name || '');
         setWaPhoneId(acad.whatsapp_settings?.phoneNumberId || '');
         setWaToken(acad.whatsapp_settings?.accessToken || '');
         setWaEnabled(acad.whatsapp_enabled);
@@ -109,8 +117,12 @@ export default function SetupWizard() {
 
     if (step === 4) {
       await DbClient.updateAcademy(academyId, {
-        razorpay_key_id: rzpKey || 'rzp_mock_key',
-        razorpay_secret: rzpSecret || 'rzp_mock_secret'
+        upi_id: upiId,
+        qr_code_url: qrCodeUrl || (upiId ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${upiId}%26pn=${encodeURIComponent(name)}%26cu=INR` : ''),
+        bank_name: bankName,
+        bank_account_no: bankAccountNo,
+        bank_ifsc: bankIfsc,
+        bank_holder_name: bankHolderName
       });
     }
 
@@ -307,7 +319,7 @@ export default function SetupWizard() {
     { num: 1, name: 'Academy Info', icon: <Building2 className="w-4 h-4" /> },
     { num: 2, name: 'Add Teachers', icon: <Users className="w-4 h-4" /> },
     { num: 3, name: 'Import Students', icon: <FileSpreadsheet className="w-4 h-4" /> },
-    { num: 4, name: 'Razorpay Connect', icon: <CreditCard className="w-4 h-4" /> },
+    { num: 4, name: 'UPI & Bank Details', icon: <CreditCard className="w-4 h-4" /> },
     { num: 5, name: 'WhatsApp API', icon: <MessageSquare className="w-4 h-4" /> },
     { num: 6, name: 'Complete', icon: <CheckCircle2 className="w-4 h-4" /> }
   ];
@@ -697,41 +709,93 @@ export default function SetupWizard() {
           )}
 
           {/* STEP 4 */}
+          {/* STEP 4 */}
           {step === 4 && (
-            <div className="space-y-4 animate-fade-in">
+            <div className="space-y-4 animate-fade-in text-slate-800">
               <h3 className="font-extrabold text-lg text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-2">
-                <CreditCard className="w-5 h-5 text-blue-600" /> 4. Connect Razorpay Gateway
+                <CreditCard className="w-5 h-5 text-blue-600" /> 4. Setup Direct Payment Credentials
               </h3>
-              <p className="text-xs text-slate-500 leading-relaxed">RemindFlow routes fees directly to your accounts. Paste your Razorpay credentials. <em>(Leave empty to activate Demo Mode with our pre-built sandbox)</em>.</p>
+              <p className="text-xs text-slate-500 leading-relaxed">Parents will pay directly to your account. Enter your UPI ID or Bank details. <em>No payment gateway integration is required.</em></p>
 
-              <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Razorpay Key ID</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Direct UPI ID</label>
                   <input
                     type="text"
-                    value={rzpKey}
-                    onChange={(e) => setRzpKey(e.target.value)}
-                    placeholder="rzp_live_..."
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-3 px-4 text-xs sm:text-sm text-slate-800 focus:outline-none transition-all"
+                    value={upiId}
+                    onChange={(e) => setUpiId(e.target.value)}
+                    placeholder="e.g. academy@upi"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Razorpay Secret Key</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">QR Code Image URL (Optional)</label>
                   <input
-                    type="password"
-                    value={rzpSecret}
-                    onChange={(e) => setRzpSecret(e.target.value)}
-                    placeholder="••••••••••••••••••••••••"
-                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-3 px-4 text-xs sm:text-sm text-slate-800 focus:outline-none transition-all"
+                    type="text"
+                    value={qrCodeUrl}
+                    onChange={(e) => setQrCodeUrl(e.target.value)}
+                    placeholder="e.g. Link to your GPay/Paytm QR Code image"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none transition-all"
                   />
+                  <span className="text-[9px] text-slate-400 mt-1 block">If left empty, the platform dynamically generates a scanning code from your UPI ID.</span>
                 </div>
               </div>
-              
+
+              <div className="border-t border-slate-100 pt-4 space-y-3">
+                <h4 className="font-bold text-xs text-slate-700">Bank Transfer Account Details (Optional)</h4>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Account Holder Name</label>
+                    <input
+                      type="text"
+                      value={bankHolderName}
+                      onChange={(e) => setBankHolderName(e.target.value)}
+                      placeholder="e.g. Apex Chess Academy"
+                      className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Bank Name</label>
+                    <input
+                      type="text"
+                      value={bankName}
+                      onChange={(e) => setBankName(e.target.value)}
+                      placeholder="e.g. ICICI Bank"
+                      className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Account Number</label>
+                    <input
+                      type="text"
+                      value={bankAccountNo}
+                      onChange={(e) => setBankAccountNo(e.target.value)}
+                      placeholder="e.g. 50100293847"
+                      className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">IFSC Code</label>
+                    <input
+                      type="text"
+                      value={bankIfsc}
+                      onChange={(e) => setBankIfsc(e.target.value)}
+                      placeholder="e.g. ICIC0000104"
+                      className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="p-3 bg-blue-50 border border-blue-100 rounded-xl text-[10px] text-slate-600 leading-normal flex gap-2">
                 <AlertCircle className="w-4.5 h-4.5 text-blue-600 flex-shrink-0" />
                 <span>
-                  <strong>Safe Mode:</strong> If you leave these blank, the system automatically uses mock sandbox checkout. You will be able to test generation of payment links and complete simulated checkouts via the Playground drawer.
+                  <strong>Setup Note:</strong> These details are automatically used inside dynamic WhatsApp alerts and landing checkout links. Parents pay directly to these accounts and upload screenshots to your recovery board.
                 </span>
               </div>
             </div>
@@ -803,7 +867,7 @@ export default function SetupWizard() {
                 <span className="font-bold text-slate-700 block mb-0.5">System Initialization Actions:</span>
                 <div>&bull; Enrolled student rosters.</div>
                 <div>&bull; Generated initial monthly invoices.</div>
-                <div>&bull; Created Razorpay payment tunnels.</div>
+                <div>&bull; Configured UPI and QR code endpoints.</div>
                 <div>&bull; Set WhatsApp automation triggers.</div>
               </div>
             </div>

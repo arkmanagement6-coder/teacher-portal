@@ -45,11 +45,11 @@ export default function LandingPage() {
     },
     {
       q: "How does the WhatsApp automation work?",
-      a: "Our system connects to the WhatsApp Business API. You define the rules (e.g. 7 days before due date, 3 days after). The system automatically formats the custom message, attaches the Razorpay payment link, and sends it directly to the parent's phone."
+      a: "Our system connects to the WhatsApp Business API. You define the rules. The system automatically formats the custom message, attaches the direct payment page link, and sends it directly to the parent's phone."
     },
     {
-      q: "Do I need my own Razorpay account?",
-      a: "Yes. You plug in your own Razorpay Key ID and Secret in your Academy Settings. The funds go directly from the parents' bank account to your merchant account immediately. We charge 0% commission on your transactions."
+      q: "Do I need a payment gateway account?",
+      a: "No. Our platform works completely without payment gateway dependencies (no Razorpay, cashfree, or Stripe keys needed). Simply input your UPI ID, QR Code, or Bank Details. Parents pay you directly via their preferred apps (GPay, PhonePe, Paytm) and upload a screenshot receipt. You verify and approve it on your dashboard, keeping 100% of your earnings."
     },
     {
       q: "Can I import my existing students quickly?",
@@ -105,7 +105,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Automate WhatsApp due reminders, instant UPI payment links, attendance notifications, and recovery dashboard pipelines for teachers and coaching institutes.
+            Automate fee reminders, recover pending fees, track attendance and manage your coaching institute from one simple platform.
           </p>
 
           <div className="pt-6 flex flex-wrap items-center justify-center gap-4">
@@ -113,13 +113,13 @@ export default function LandingPage() {
               href="/signup" 
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl text-base shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.03] flex items-center gap-2"
             >
-              Start 14-Day Free Trial <ChevronRight className="w-5 h-5" />
+              Start Free Trial <ChevronRight className="w-5 h-5" />
             </Link>
             <Link 
               href="#pricing"
               className="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold px-8 py-4 rounded-xl text-base transition-all hover:border-slate-300"
             >
-              Book 1-on-1 Demo
+              Book Demo
             </Link>
           </div>
 
@@ -200,32 +200,32 @@ export default function LandingPage() {
               {
                 icon: <MessageSquare className="w-6 h-6 text-blue-600" />,
                 title: "WhatsApp Reminders",
-                desc: "Send due notifications automatically. Include clickable Razorpay payment links. Schedule rules for 7 days before, due date, or overdue notices."
+                desc: "Send due notifications automatically. Include clickable payment pages showing your UPI ID, QR Code, and Bank transfer details."
               },
               {
                 icon: <Clock className="w-6 h-6 text-orange-600" />,
                 title: "Auto Fee Generator",
-                desc: "Specify separate monthly fees for students. The system automatically drafts fresh pending invoices at the beginning of each billing cycle."
+                desc: "Specify monthly fees for students. The system automatically generates fresh pending invoices at the beginning of each billing cycle."
               },
               {
                 icon: <BarChart3 className="w-6 h-6 text-blue-600" />,
                 title: "Recovery Dashboard",
-                desc: "Track age-based overdue categories (1-7 days, 15-30 days). Instantly tap to trigger WhatsApp reminders or launch parent call logs."
+                desc: "Track age-based overdue categories. Instantly tap to trigger manual WhatsApp follow-ups, call parents, or audit outstanding balances."
               },
               {
                 icon: <Users className="w-6 h-6 text-orange-600" />,
                 title: "Attendance Tracker",
-                desc: "Mobile-friendly marking grid for teachers. Check daily batches and immediately alert parents via WhatsApp if a student is absent."
+                desc: "Mobile-friendly marking grid for teachers. Check batch rosters, mark present/absent/online, and automatically notify parents."
               },
               {
                 icon: <ShieldCheck className="w-6 h-6 text-blue-600" />,
-                title: "Direct Gateway Connect",
-                desc: "Hook up your own Razorpay key and secret. Receive payments directly in your bank account with zero middleman commissions."
+                title: "P2P Direct Payments",
+                desc: "No payment gateway or integration needed. Parents pay directly to your account details and upload screenshot receipts for verification."
               },
               {
                 icon: <Zap className="w-6 h-6 text-orange-600" />,
                 title: "Excel & CSV Importer",
-                desc: "Add 100+ students instantly using our spreadsheet template. Upload names, batch lists, mobile numbers, and monthly dues in one click."
+                desc: "Add 100+ students instantly using our spreadsheet template. Upload names, parent contacts, mobile numbers, and monthly dues in one click."
               }
             ].map((f, i) => (
               <div key={i} className="p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-200 hover:shadow-md transition-all flex flex-col gap-4">
@@ -339,7 +339,7 @@ export default function LandingPage() {
               price: "₹1,499",
               period: "/ month billed monthly",
               desc: "Perfect for growing local tuition and skill academies.",
-              features: ["Up to 150 Students", "3 Teacher Accounts", "Razorpay Production Gateways", "Automated WhatsApp API Outbox", "Monthly Recovery Dashboard", "PDF/Excel report exports"],
+              features: ["Up to 150 Students", "3 Teacher Accounts", "Direct UPI & QR Settlements", "Automated WhatsApp API Outbox", "Monthly Recovery Dashboard", "PDF/Excel report exports"],
               cta: "Start 14-Day Trial",
               link: "/signup",
               popular: true

@@ -14,8 +14,12 @@ export default function SettingsPage() {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [logo, setLogo] = useState('');
-  const [rzpKey, setRzpKey] = useState('');
-  const [rzpSecret, setRzpSecret] = useState('');
+  const [upiId, setUpiId] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const [bankName, setBankName] = useState('');
+  const [bankAccountNo, setBankAccountNo] = useState('');
+  const [bankIfsc, setBankIfsc] = useState('');
+  const [bankHolderName, setBankHolderName] = useState('');
   const [waPhoneId, setWaPhoneId] = useState('');
   const [waToken, setWaToken] = useState('');
   const [resendKey, setResendKey] = useState('');
@@ -32,8 +36,12 @@ export default function SettingsPage() {
         setName(acad.name || '');
         setAddress(acad.address || '');
         setLogo(acad.logo_url || '');
-        setRzpKey(acad.razorpay_key_id || '');
-        setRzpSecret(acad.razorpay_secret || '');
+        setUpiId(acad.upi_id || '');
+        setQrCodeUrl(acad.qr_code_url || '');
+        setBankName(acad.bank_name || '');
+        setBankAccountNo(acad.bank_account_no || '');
+        setBankIfsc(acad.bank_ifsc || '');
+        setBankHolderName(acad.bank_holder_name || '');
         setWaPhoneId(acad.whatsapp_settings?.phoneNumberId || '');
         setWaToken(acad.whatsapp_settings?.accessToken || '');
         setResendKey(acad.resend_api_key || '');
@@ -54,8 +62,12 @@ export default function SettingsPage() {
         name,
         address,
         logo_url: logo,
-        razorpay_key_id: rzpKey,
-        razorpay_secret: rzpSecret,
+        upi_id: upiId,
+        qr_code_url: qrCodeUrl || (upiId ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=${upiId}%26pn=${encodeURIComponent(name)}%26cu=INR` : ''),
+        bank_name: bankName,
+        bank_account_no: bankAccountNo,
+        bank_ifsc: bankIfsc,
+        bank_holder_name: bankHolderName,
         resend_api_key: resendKey,
         whatsapp_settings: {
           phoneNumberId: waPhoneId,
@@ -65,7 +77,7 @@ export default function SettingsPage() {
       showToast('Settings saved successfully!', 'success');
       loadSettings();
     } catch (err) {
-      showToast('Failed to update integration profiles', 'error');
+      showToast('Failed to update settings profiles', 'error');
     }
   };
 
@@ -130,32 +142,83 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Step 2: Payment Gateways */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+        {/* Step 2: Payment Settings */}
+        <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm text-slate-800">
           <h3 className="font-extrabold text-sm text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2">
-            <CreditCard className="w-4.5 h-4.5 text-blue-600" /> Razorpay Integration
+            <CreditCard className="w-4.5 h-4.5 text-blue-600" /> UPI & Bank Transfer Credentials
           </h3>
+          <p className="text-xs text-slate-500">Configure details parents pay to directly. These are embedded in automated reminder notifications.</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Razorpay Key ID</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Direct UPI ID</label>
               <input
                 type="text"
-                value={rzpKey}
-                onChange={(e) => setRzpKey(e.target.value)}
-                placeholder="rzp_live_..."
+                value={upiId}
+                onChange={(e) => setUpiId(e.target.value)}
+                placeholder="e.g. business@upi"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:border-blue-500 focus:outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Razorpay Secret Key</label>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">QR Code Image URL (Optional)</label>
               <input
-                type="password"
-                value={rzpSecret}
-                onChange={(e) => setRzpSecret(e.target.value)}
-                placeholder="••••••••••••••••"
+                type="text"
+                value={qrCodeUrl}
+                onChange={(e) => setQrCodeUrl(e.target.value)}
+                placeholder="e.g. https://domain.com/my-qr.png"
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:border-blue-500 focus:outline-none transition-colors"
               />
+            </div>
+          </div>
+
+          <div className="border-t border-slate-100 pt-4 space-y-3">
+            <h4 className="font-bold text-xs text-slate-700">Bank Transfer Account (Optional)</h4>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Account Holder Name</label>
+                <input
+                  type="text"
+                  value={bankHolderName}
+                  onChange={(e) => setBankHolderName(e.target.value)}
+                  placeholder="e.g. Apex Chess Academy"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Bank Name</label>
+                <input
+                  type="text"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                  placeholder="e.g. State Bank of India"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Account Number</label>
+                <input
+                  type="text"
+                  value={bankAccountNo}
+                  onChange={(e) => setBankAccountNo(e.target.value)}
+                  placeholder="e.g. 1029384756"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Bank IFSC Code</label>
+                <input
+                  type="text"
+                  value={bankIfsc}
+                  onChange={(e) => setBankIfsc(e.target.value)}
+                  placeholder="e.g. SBIN0001234"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
             </div>
           </div>
         </div>

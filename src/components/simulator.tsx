@@ -135,7 +135,7 @@ export function SimulatorPanel() {
               onClick={() => setActiveTab('payments')}
               className={`flex-1 py-2 text-center rounded-md transition-colors ${activeTab === 'payments' ? 'bg-blue-50 text-blue-600 border border-blue-100 font-bold' : 'text-slate-500 hover:text-slate-800'}`}
             >
-              Razorpay Links ({pendingPayments.length})
+              Payment Links ({pendingPayments.length})
             </button>
             <button
               onClick={() => setActiveTab('whatsapp')}
@@ -156,28 +156,28 @@ export function SimulatorPanel() {
             {activeTab === 'payments' && (
               <div className="space-y-3">
                 <p className="text-xs text-slate-500 mb-2">
-                  When you create invoices or copy payment links, they register here as active transaction tunnels. Simulate a parent completing their online payment:
+                  When you generate fee bills, they register here as active payment channels. Click to open the parent checkout page, scan the QR code/UPI, and upload a payment screenshot:
                 </p>
                 {pendingPayments.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
                     <CheckCircle className="w-8 h-8 text-slate-300" />
                     <p className="text-sm text-slate-400">No active pending checkout sessions found.</p>
-                    <p className="text-[10px] text-slate-500">Create an invoice or trigger payment link generation in Fee Management.</p>
+                    <p className="text-[10px] text-slate-500">Create a student invoice or trigger a payment link in Fee Recovery or Payments.</p>
                   </div>
                 ) : (
                   pendingPayments.map(p => (
                     <div key={p.id} className="p-3 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between text-xs hover:border-blue-200 transition-all">
                       <div>
                         <div className="font-bold text-slate-800">{p.student_name || 'Chess Student'}</div>
-                        <div className="text-[10px] text-slate-500">Order ID: {p.razorpay_order_id}</div>
-                        <div className="mt-1 text-emerald-605 font-bold text-sm">₹{p.amount}</div>
+                        <div className="text-[10px] text-slate-500">Invoice Ref: {p.id}</div>
+                        <div className="mt-1 text-emerald-650 font-bold text-sm">₹{p.amount}</div>
                       </div>
                       <button
-                        onClick={() => handleSimulatePayment(p)}
+                        onClick={() => window.open(`/pay/${p.id}`, '_blank')}
                         className="bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-100 px-3 py-1.5 rounded-md flex items-center gap-1 font-bold transition-colors"
                       >
                         <Play className="w-3 h-3 fill-emerald-600" />
-                        <span>Pay Link</span>
+                        <span>Pay Page</span>
                       </button>
                     </div>
                   ))
