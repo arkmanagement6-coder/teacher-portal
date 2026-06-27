@@ -86,6 +86,11 @@ export default function OwnerDashboard() {
     );
   }
 
+  const chartMax = Math.max(stats.collectedThisMonth, stats.pendingFees, stats.overdueFees, 1);
+  const collectedHeight = Math.max(12, (stats.collectedThisMonth / chartMax) * 140);
+  const pendingHeight = Math.max(12, (stats.pendingFees / chartMax) * 140);
+  const overdueHeight = Math.max(12, (stats.overdueFees / chartMax) * 140);
+
   return (
     <div className="space-y-8 animate-fade-in text-slate-800">
       
@@ -174,21 +179,21 @@ export default function OwnerDashboard() {
             
             {/* Visual Bars */}
             <div className="flex flex-col items-center w-1/4 group">
-              <div className="w-full bg-blue-100 hover:bg-blue-200/80 rounded-t-xl border border-blue-200 transition-all flex items-end justify-center" style={{ height: '140px' }}>
+              <div className="w-full bg-blue-100 hover:bg-blue-200/80 rounded-t-xl border border-blue-200 transition-all flex items-end justify-center" style={{ height: `${collectedHeight}px` }}>
                 <span className="text-[10px] font-bold text-blue-600 pb-2">₹{stats.collectedThisMonth}</span>
               </div>
               <span className="text-[9px] text-slate-500 mt-2 font-bold uppercase tracking-wider">Collected</span>
             </div>
 
             <div className="flex flex-col items-center w-1/4 group">
-              <div className="w-full bg-orange-100 hover:bg-orange-200/80 rounded-t-xl border border-orange-200 transition-all flex items-end justify-center" style={{ height: `${Math.max(10, (stats.pendingFees / (stats.collectedThisMonth || 1)) * 140)}px` }}>
+              <div className="w-full bg-orange-100 hover:bg-orange-200/80 rounded-t-xl border border-orange-200 transition-all flex items-end justify-center" style={{ height: `${pendingHeight}px` }}>
                 <span className="text-[10px] font-bold text-orange-600 pb-2">₹{stats.pendingFees}</span>
               </div>
               <span className="text-[9px] text-slate-500 mt-2 font-bold uppercase tracking-wider">Pending</span>
             </div>
 
             <div className="flex flex-col items-center w-1/4 group">
-              <div className="w-full bg-rose-100 hover:bg-rose-200/80 rounded-t-xl border border-rose-200 transition-all flex items-end justify-center" style={{ height: `${Math.max(10, (stats.overdueFees / (stats.collectedThisMonth || 1)) * 140)}px` }}>
+              <div className="w-full bg-rose-100 hover:bg-rose-200/80 rounded-t-xl border border-rose-200 transition-all flex items-end justify-center" style={{ height: `${overdueHeight}px` }}>
                 <span className="text-[10px] font-bold text-rose-600 pb-2">₹{stats.overdueFees}</span>
               </div>
               <span className="text-[9px] text-slate-500 mt-2 font-bold uppercase tracking-wider">Overdue</span>
