@@ -159,14 +159,14 @@ export default function TeachersPage() {
 
       {/* Add Teacher Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 bg-[#000000]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-scale-up">
+        <div className="fixed inset-0 bg-[#000000]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-scale-up">
             
-            <div className="p-5 border-b border-white/5 flex items-center justify-between">
-              <h3 className="font-extrabold text-base text-white">Add Academy Staff</h3>
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-extrabold text-base text-slate-900">Add Academy Staff</h3>
               <button 
                 onClick={() => setIsAddOpen(false)} 
-                className="text-zinc-500 hover:text-white transition-colors"
+                className="text-slate-500 hover:text-slate-800 transition-colors text-xs font-bold"
               >
                 Cancel
               </button>
@@ -174,52 +174,52 @@ export default function TeachersPage() {
 
             <form onSubmit={handleAddTeacher} className="p-5 space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Teacher Full Name</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Teacher Full Name</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Neelam Sen"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Email Address</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Email Address</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="neelam@academy.com"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Mobile Phone Number</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Mobile Phone Number</label>
                 <input
                   type="tel"
                   required
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   placeholder="9876543210"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
-              <div className="pt-4 border-t border-white/5 flex justify-end gap-2 text-xs">
+              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="bg-zinc-950 hover:bg-zinc-800 text-zinc-300 border border-white/5 px-4.5 py-2.5 rounded-lg"
+                  className="bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 px-4.5 py-2.5 rounded-xl font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-violet-600 hover:bg-violet-500 text-white font-bold px-5 py-2.5 rounded-lg transition-all"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl transition-all"
                 >
                   Register Teacher
                 </button>

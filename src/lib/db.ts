@@ -56,6 +56,7 @@ export interface Student {
   due_date: number; // day of month 1-31
   status: 'active' | 'inactive';
   notes?: string;
+  roll_no?: string;
   created_at: string;
 }
 

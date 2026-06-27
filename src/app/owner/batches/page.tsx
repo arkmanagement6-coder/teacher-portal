@@ -149,14 +149,14 @@ export default function BatchesPage() {
 
       {/* Create Batch Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 bg-[#000000]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-scale-up">
+        <div className="fixed inset-0 bg-[#000000]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full overflow-hidden shadow-2xl animate-scale-up">
             
-            <div className="p-5 border-b border-white/5 flex items-center justify-between">
-              <h3 className="font-extrabold text-base text-white">Create New Batch</h3>
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="font-extrabold text-base text-slate-900">Create New Batch</h3>
               <button 
                 onClick={() => setIsAddOpen(false)} 
-                className="text-zinc-500 hover:text-white transition-colors"
+                className="text-slate-500 hover:text-slate-800 transition-colors text-xs font-bold"
               >
                 Cancel
               </button>
@@ -164,36 +164,36 @@ export default function BatchesPage() {
 
             <form onSubmit={handleCreateBatch} className="p-5 space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Batch / Class Name</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Batch / Class Name</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Chess Beginners"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Timings</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Timings</label>
                 <input
                   type="text"
                   required
                   value={timings}
                   onChange={(e) => setTimings(e.target.value)}
                   placeholder="e.g. Mon, Wed, Fri (5:00 PM - 6:00 PM)"
-                  className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white placeholder-zinc-500 focus:outline-none"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Assign Instructor</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Assign Instructor</label>
                   <select
                     value={teacherId}
                     onChange={(e) => setTeacherId(e.target.value)}
-                    className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none"
                   >
                     <option value="">Choose teacher...</option>
                     {teachers.map(t => (
@@ -202,27 +202,27 @@ export default function BatchesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-zinc-400 uppercase mb-1.5">Maximum Capacity</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1.5">Maximum Capacity</label>
                   <input
                     type="number"
                     value={capacity}
                     onChange={(e) => setCapacity(e.target.value)}
-                    className="w-full bg-zinc-950 border border-white/5 rounded-lg py-2.5 px-3 text-xs text-white focus:outline-none"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-white/5 flex justify-end gap-2 text-xs">
+              <div className="pt-4 border-t border-slate-100 flex justify-end gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="bg-zinc-950 hover:bg-zinc-800 text-zinc-300 border border-white/5 px-4.5 py-2.5 rounded-lg"
+                  className="bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 px-4.5 py-2.5 rounded-xl font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="bg-violet-600 hover:bg-violet-500 text-white font-bold px-5 py-2.5 rounded-lg transition-all"
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl transition-all"
                 >
                   Create Batch
                 </button>

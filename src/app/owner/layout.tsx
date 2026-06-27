@@ -42,6 +42,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
     { name: 'Recovery Board', path: '/owner/recovery', icon: <BarChart3 className="w-4.5 h-4.5" /> },
     { name: 'WhatsApp API', path: '/owner/whatsapp', icon: <MessageSquare className="w-4.5 h-4.5" /> },
     { name: 'Reports', path: '/owner/reports', icon: <BarChart3 className="w-4.5 h-4.5" /> },
+    { name: 'Attendance Scanner', path: '/owner/scanner', icon: <Zap className="w-4.5 h-4.5 text-orange-500" /> },
     { name: 'Settings', path: '/owner/settings', icon: <Settings className="w-4.5 h-4.5" /> }
   ];
 
