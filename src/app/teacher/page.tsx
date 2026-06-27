@@ -19,7 +19,7 @@ export default function TeacherDashboard() {
   
   // Attendance marking states
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [attendanceRecords, setAttendanceRecords] = useState<Record<string, 'present' | 'absent' | 'leave'>>({});
+  const [attendanceRecords, setAttendanceRecords] = useState<Record<string, 'present' | 'absent' | 'leave' | 'online'>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,15 +68,15 @@ export default function TeacherDashboard() {
 
     const existing = await DbClient.getAttendance(selectedDate, batchId);
     
-    const records: Record<string, 'present' | 'absent' | 'leave'> = {};
+    const records: Record<string, 'present' | 'absent' | 'leave' | 'online'> = {};
     batchStds.forEach(s => {
       const match = existing.find(e => e.student_id === s.id);
-      records[s.id] = match ? match.status : 'present';
+      records[s.id] = (match ? match.status : 'present') as any;
     });
     setAttendanceRecords(records);
   };
 
-  const handleMarkStatus = (studentId: string, status: 'present' | 'absent' | 'leave') => {
+  const handleMarkStatus = (studentId: string, status: 'present' | 'absent' | 'leave' | 'online') => {
     setAttendanceRecords(prev => ({
       ...prev,
       [studentId]: status
@@ -107,6 +107,14 @@ export default function TeacherDashboard() {
                 attendance_status: 'ABSENT',
                 date: selectedDate
               }
+            );
+          } else if (record.status === 'online') {
+            const studentName = students.find(s => s.id === record.student_id)?.name || 'Student';
+            await DbClient.triggerWhatsAppReminder(
+              academy.id,
+              record.student_id,
+              'class_reminder',
+              `Dear Parent, ${studentName} has joined the online class successfully today (${selectedDate}).`
             );
           }
         }
@@ -235,10 +243,10 @@ export default function TeacherDashboard() {
                     </div>
 
                     {/* Marked options */}
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-1.5">
                       <button
                         onClick={() => handleMarkStatus(s.id, 'present')}
-                        className={`py-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 ${
+                        className={`py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all border flex items-center justify-center gap-0.5 ${
                           currentStatus === 'present' 
                             ? 'bg-emerald-50 border-emerald-200 text-emerald-600 font-extrabold' 
                             : 'bg-slate-50 border-slate-200 text-slate-500'
@@ -249,7 +257,7 @@ export default function TeacherDashboard() {
 
                       <button
                         onClick={() => handleMarkStatus(s.id, 'absent')}
-                        className={`py-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 ${
+                        className={`py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all border flex items-center justify-center gap-0.5 ${
                           currentStatus === 'absent' 
                             ? 'bg-rose-50 border-rose-200 text-rose-600 font-extrabold' 
                             : 'bg-slate-50 border-slate-200 text-slate-500'
@@ -259,8 +267,19 @@ export default function TeacherDashboard() {
                       </button>
 
                       <button
+                        onClick={() => handleMarkStatus(s.id, 'online')}
+                        className={`py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all border flex items-center justify-center gap-0.5 ${
+                          currentStatus === 'online' 
+                            ? 'bg-blue-50 border-blue-200 text-blue-600 font-extrabold' 
+                            : 'bg-slate-50 border-slate-200 text-slate-500'
+                        }`}
+                      >
+                        Online
+                      </button>
+
+                      <button
                         onClick={() => handleMarkStatus(s.id, 'leave')}
-                        className={`py-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1 ${
+                        className={`py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all border flex items-center justify-center gap-0.5 ${
                           currentStatus === 'leave' 
                             ? 'bg-amber-50 border-amber-200 text-amber-600 font-extrabold' 
                             : 'bg-slate-50 border-slate-200 text-slate-500'

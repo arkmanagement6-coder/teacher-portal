@@ -373,7 +373,7 @@ export default function StudentsPage() {
                       <div key={i} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-center text-xs space-y-1">
                         <div className="text-[10px] text-slate-400">{a.date}</div>
                         <div className={`font-bold capitalize ${
-                          a.status === 'present' ? 'text-emerald-600' : a.status === 'absent' ? 'text-rose-600' : 'text-amber-600'
+                          a.status === 'present' ? 'text-emerald-600' : a.status === 'absent' ? 'text-rose-600' : a.status === 'online' ? 'text-blue-600' : 'text-amber-600'
                         }`}>
                           {a.status}
                         </div>

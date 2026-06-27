@@ -93,7 +93,7 @@ export interface Attendance {
   student_name?: string;
   batch_id: string;
   date: string; // YYYY-MM-DD
-  status: 'present' | 'absent' | 'leave';
+  status: 'present' | 'absent' | 'leave' | 'online';
   marked_by: string;
   created_at: string;
 }
@@ -547,7 +547,7 @@ export class DbClient {
     });
   }
 
-  static async markAttendance(records: { student_id: string; status: 'present' | 'absent' | 'leave' }[], date: string, batchId: string, teacherId: string): Promise<void> {
+  static async markAttendance(records: { student_id: string; status: 'present' | 'absent' | 'leave' | 'online' }[], date: string, batchId: string, teacherId: string): Promise<void> {
     const store = this.getStore();
     // remove existing for this date and batch
     store.attendance = store.attendance.filter(a => !(a.date === date && a.batch_id === batchId));
