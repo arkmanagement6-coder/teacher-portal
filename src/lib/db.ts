@@ -9,6 +9,7 @@ export interface Profile {
   role: UserRole;
   mobile?: string;
   email: string;
+  password?: string;
 }
 
 export interface Academy {
@@ -129,9 +130,9 @@ export interface SupportTicket {
 
 // Initial mock data definitions
 const MOCK_PROFILES: Profile[] = [
-  { id: 'usr-admin', name: 'Super Admin', role: 'super_admin', email: 'admin@test.com', mobile: '9999900000' },
-  { id: 'usr-owner', name: 'Vikram Aditya', role: 'owner', email: 'owner@test.com', mobile: '9876543210' },
-  { id: 'usr-teacher', name: 'Neelam Sen', role: 'teacher', email: 'teacher@test.com', mobile: '8765432109' }
+  { id: 'usr-admin', name: 'Super Admin', role: 'super_admin', email: 'admin@test.com', mobile: '9999900000', password: 'password123' },
+  { id: 'usr-owner', name: 'Vikram Aditya', role: 'owner', email: 'owner@test.com', mobile: '9876543210', password: 'password123' },
+  { id: 'usr-teacher', name: 'Neelam Sen', role: 'teacher', email: 'teacher@test.com', mobile: '8765432109', password: 'password123' }
 ];
 
 const MOCK_ACADEMIES: Academy[] = [
@@ -331,7 +332,7 @@ export class DbClient {
   }
 
   // Load database state
-  private static getStore() {
+  public static getStore() {
     const profiles = getStorageItem<Profile[]>('db_profiles', MOCK_PROFILES);
     const academies = getStorageItem<Academy[]>('db_academies', MOCK_ACADEMIES);
     const batches = getStorageItem<Batch[]>('db_batches', MOCK_BATCHES);
@@ -346,7 +347,7 @@ export class DbClient {
     return { profiles, academies, batches, students, fees, payments, attendance, logs, tickets, currentUser };
   }
 
-  private static saveStore(store: ReturnType<typeof DbClient.getStore>) {
+  public static saveStore(store: ReturnType<typeof DbClient.getStore>) {
     setStorageItem('db_profiles', store.profiles);
     setStorageItem('db_academies', store.academies);
     setStorageItem('db_batches', store.batches);
@@ -400,9 +401,28 @@ export class DbClient {
     const profile = store.profiles.find(p => p.email.toLowerCase() === email.toLowerCase());
     if (!profile) return { success: false, error: 'Invalid email or password.' };
 
+    if (profile.password && password && profile.password !== password) {
+      return { success: false, error: 'Invalid email or password.' };
+    }
+
     store.currentUser = profile;
     this.saveStore(store);
     return { success: true, user: profile };
+  }
+
+  static async changePassword(userId: string, newPassword: string): Promise<boolean> {
+    const store = this.getStore();
+    const idx = store.profiles.findIndex(p => p.id === userId);
+    if (idx === -1) return false;
+    store.profiles[idx].password = newPassword;
+    
+    // Also update currentUser if it's the logged in user
+    if (store.currentUser && store.currentUser.id === userId) {
+      store.currentUser.password = newPassword;
+    }
+    
+    this.saveStore(store);
+    return true;
   }
 
   static async signOut(): Promise<void> {
@@ -413,6 +433,10 @@ export class DbClient {
 
   static async getCurrentUser(): Promise<Profile | null> {
     return this.getStore().currentUser;
+  }
+
+  static async getProfiles(): Promise<Profile[]> {
+    return this.getStore().profiles;
   }
 
   // ACADEMY API
