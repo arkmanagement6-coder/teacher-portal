@@ -41,6 +41,16 @@ export default function SetupWizard() {
   const [sMobile, setSMobile] = useState('');
   const [sFee, setSFee] = useState('1500');
   const [sDueDate, setSDueDate] = useState('5');
+  const [sJoiningDate, setSJoiningDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Student inline edit states
+  const [editingStudentIndex, setEditingStudentIndex] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editParent, setEditParent] = useState('');
+  const [editMobile, setEditMobile] = useState('');
+  const [editFee, setEditFee] = useState('');
+  const [editDueDate, setEditDueDate] = useState('');
+  const [editJoiningDate, setEditJoiningDate] = useState('');
 
   // Step 4: Razorpay Connect
   const [rzpKey, setRzpKey] = useState('');
@@ -142,18 +152,59 @@ export default function SetupWizard() {
     }
     setStudents([...students, {
       name: sName,
-      parent_name: sParent,
+      parent_name: sParent || 'Parent',
       mobile: sMobile,
       whatsapp: sMobile,
-      email: '',
+      email: sName.toLowerCase().replace(/\s+/g, '') + '@example.com',
       monthly_fee: Number(sFee) || 1500,
       due_date: Number(sDueDate) || 5,
-      joining_date: new Date().toISOString().split('T')[0],
+      joining_date: sJoiningDate || new Date().toISOString().split('T')[0],
       status: 'active'
     }]);
     setSName('');
     setSParent('');
     setSMobile('');
+    setSFee('1500');
+    setSDueDate('5');
+    setSJoiningDate(new Date().toISOString().split('T')[0]);
+  };
+
+  const startEditingStudent = (index: number) => {
+    const std = students[index];
+    setEditingStudentIndex(index);
+    setEditName(std.name || '');
+    setEditParent(std.parent_name || '');
+    setEditMobile(std.mobile || '');
+    setEditFee(String(std.monthly_fee || 1500));
+    setEditDueDate(String(std.due_date || 5));
+    setEditJoiningDate(std.joining_date || new Date().toISOString().split('T')[0]);
+  };
+
+  const saveEditedStudent = (index: number) => {
+    if (!editName || !editMobile) {
+      showToast('Name and Mobile are required for editing', 'error');
+      return;
+    }
+    const updated = [...students];
+    updated[index] = {
+      ...updated[index],
+      name: editName,
+      parent_name: editParent,
+      mobile: editMobile,
+      whatsapp: editMobile,
+      monthly_fee: Number(editFee) || 1500,
+      due_date: Number(editDueDate) || 5,
+      joining_date: editJoiningDate
+    };
+    setStudents(updated);
+    setEditingStudentIndex(null);
+    showToast('Student details updated successfully!', 'success');
+  };
+
+  const deleteStudent = (index: number) => {
+    const updated = students.filter((_, i) => i !== index);
+    setStudents(updated);
+    showToast('Student removed from list', 'success');
   };
 
   const handleParseCSV = () => {
@@ -354,32 +405,84 @@ export default function SetupWizard() {
               <p className="text-xs text-slate-500 leading-relaxed">Paste standard spreadsheet rows or manually append students below. Seeding initial accounts saves hours of entry time.</p>
 
               {/* Manual quick add form */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end bg-slate-50 p-3.5 rounded-xl border border-slate-200">
-                <div className="sm:col-span-2">
-                  <input
-                    type="text"
-                    value={sName}
-                    onChange={(e) => setSName(e.target.value)}
-                    placeholder="Student Name"
-                    className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
-                  />
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2 space-y-3">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Manually Add Student</span>
+                
+                {/* Row 1: Student Name, Parent Name, Mobile */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Student Name</label>
+                    <input
+                      type="text"
+                      value={sName}
+                      onChange={(e) => setSName(e.target.value)}
+                      placeholder="Student Name"
+                      className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Parent Name</label>
+                    <input
+                      type="text"
+                      value={sParent}
+                      onChange={(e) => setSParent(e.target.value)}
+                      placeholder="Parent/Guardian Name"
+                      className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">WhatsApp Mobile</label>
+                    <input
+                      type="tel"
+                      value={sMobile}
+                      onChange={(e) => setSMobile(e.target.value)}
+                      placeholder="WhatsApp Mobile"
+                      className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <input
-                    type="text"
-                    value={sMobile}
-                    onChange={(e) => setSMobile(e.target.value)}
-                    placeholder="WhatsApp Mobile"
-                    className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
-                  />
+
+                {/* Row 2: Monthly Fee, Due Date, Admission Date */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Monthly Fee (₹)</label>
+                    <input
+                      type="number"
+                      value={sFee}
+                      onChange={(e) => setSFee(e.target.value)}
+                      placeholder="Monthly Fee (₹)"
+                      className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Fee Due Date (Day of Month)</label>
+                    <input
+                      type="number"
+                      value={sDueDate}
+                      onChange={(e) => setSDueDate(e.target.value)}
+                      placeholder="Due Date (e.g. 5)"
+                      className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Admission Date</label>
+                    <input
+                      type="date"
+                      value={sJoiningDate}
+                      onChange={(e) => setSJoiningDate(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    />
+                  </div>
                 </div>
-                <div>
+
+                {/* Row 3: Add button */}
+                <div className="flex justify-end pt-1">
                   <button
                     type="button"
                     onClick={handleAddStudent}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg text-xs transition-all shadow-sm"
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-lg text-xs transition-all shadow-sm flex items-center gap-1"
                   >
-                    + Add Student
+                    <Plus className="w-3.5 h-3.5" /> Add Student
                   </button>
                 </div>
               </div>
@@ -410,6 +513,127 @@ export default function SetupWizard() {
                   <button onClick={() => setStudents([])} className="text-rose-600 hover:underline">Clear list</button>
                 )}
               </div>
+
+              {/* Added Student Database List (Edit/Delete) */}
+              {students.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Enrolled Student Roster ({students.length})</span>
+                  
+                  <div className="border border-slate-200 rounded-xl overflow-hidden bg-white max-h-[300px] overflow-y-auto shadow-sm">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+                          <th className="p-3">Student Name</th>
+                          <th className="p-3">Parent Name</th>
+                          <th className="p-3">Mobile / WhatsApp</th>
+                          <th className="p-3">Monthly Fee</th>
+                          <th className="p-3">Due Date</th>
+                          <th className="p-3">Admission Date</th>
+                          <th className="p-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {students.map((s, idx) => {
+                          const isEditing = editingStudentIndex === idx;
+                          return (
+                            <tr key={idx} className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                              {isEditing ? (
+                                <>
+                                  <td className="p-2">
+                                    <input
+                                      type="text"
+                                      value={editName}
+                                      onChange={(e) => setEditName(e.target.value)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded p-1 text-xs text-slate-800 focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="text"
+                                      value={editParent}
+                                      onChange={(e) => setEditParent(e.target.value)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded p-1 text-xs text-slate-800 focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="text"
+                                      value={editMobile}
+                                      onChange={(e) => setEditMobile(e.target.value)}
+                                      className="w-full bg-slate-50 border border-slate-200 rounded p-1 text-xs text-slate-800 focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="number"
+                                      value={editFee}
+                                      onChange={(e) => setEditFee(e.target.value)}
+                                      className="w-20 bg-slate-50 border border-slate-200 rounded p-1 text-xs text-slate-800 focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="number"
+                                      value={editDueDate}
+                                      onChange={(e) => setEditDueDate(e.target.value)}
+                                      className="w-16 bg-slate-50 border border-slate-200 rounded p-1 text-xs text-slate-800 focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="p-2">
+                                    <input
+                                      type="date"
+                                      value={editJoiningDate}
+                                      onChange={(e) => setEditJoiningDate(e.target.value)}
+                                      className="w-28 bg-slate-50 border border-slate-200 rounded p-1 text-xs text-slate-800 focus:outline-none"
+                                    />
+                                  </td>
+                                  <td className="p-2 text-right space-x-1.5 whitespace-nowrap">
+                                    <button 
+                                      onClick={() => saveEditedStudent(idx)} 
+                                      className="text-emerald-600 hover:text-emerald-500 font-bold px-2 py-0.5 rounded border border-emerald-100 bg-emerald-50 text-[10px]"
+                                    >
+                                      Save
+                                    </button>
+                                    <button 
+                                      onClick={() => setEditingStudentIndex(null)} 
+                                      className="text-slate-500 hover:text-slate-400 font-bold px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-[10px]"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </td>
+                                </>
+                              ) : (
+                                <>
+                                  <td className="p-3 font-bold text-slate-800">{s.name}</td>
+                                  <td className="p-3 text-slate-600">{s.parent_name}</td>
+                                  <td className="p-3 text-slate-650 font-mono">{s.mobile}</td>
+                                  <td className="p-3 text-blue-600 font-extrabold">₹{s.monthly_fee}</td>
+                                  <td className="p-3 text-orange-600 font-bold">Day {s.due_date}</td>
+                                  <td className="p-3 text-slate-500 font-mono">{s.joining_date}</td>
+                                  <td className="p-3 text-right space-x-2 whitespace-nowrap">
+                                    <button 
+                                      onClick={() => startEditingStudent(idx)} 
+                                      className="text-blue-650 hover:text-blue-500 font-bold hover:underline"
+                                    >
+                                      Edit
+                                    </button>
+                                    <button 
+                                      onClick={() => deleteStudent(idx)} 
+                                      className="text-rose-600 hover:text-rose-500 font-bold hover:underline"
+                                    >
+                                      Delete
+                                    </button>
+                                  </td>
+                                </>
+                              )}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
