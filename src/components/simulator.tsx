@@ -103,7 +103,7 @@ export function SimulatorPanel() {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 text-slate-800">
+    <div className="fixed bottom-6 right-6 z-50 text-slate-800">
       
       {/* Floating Action Button - Swapped to Orange gradient for secondary accent highlight */}
       <button
@@ -116,7 +116,7 @@ export function SimulatorPanel() {
 
       {/* Simulator Drawer Panel - Styled in white & slate border */}
       {isOpen && (
-        <div className="absolute bottom-16 left-0 w-96 max-w-sm rounded-2xl bg-white text-slate-800 shadow-2xl overflow-hidden border border-slate-200 animate-scale-up flex flex-col h-[480px]">
+        <div className="absolute bottom-16 right-0 w-96 max-w-sm rounded-2xl bg-white text-slate-800 shadow-2xl overflow-hidden border border-slate-200 animate-scale-up flex flex-col h-[480px]">
           
           {/* Header */}
           <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
