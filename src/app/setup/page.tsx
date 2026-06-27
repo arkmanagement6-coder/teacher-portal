@@ -121,11 +121,11 @@ export default function SetupWizard() {
   };
 
   const handleAddTeacher = () => {
-    if (!tName || !tEmail || !tMobile) {
-      showToast('Fill in all teacher fields', 'error');
+    if (!tName || !tEmail) {
+      showToast('Teacher name and email are required', 'error');
       return;
     }
-    setTeachers([...teachers, { name: tName, email: tEmail, mobile: tMobile }]);
+    setTeachers([...teachers, { name: tName, email: tEmail, mobile: tMobile || 'N/A' }]);
     setTName('');
     setTEmail('');
     setTMobile('');
@@ -283,14 +283,14 @@ export default function SetupWizard() {
 
               {/* Add form */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 items-end bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2">
-                <div className="sm:col-span-2">
+                <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Teacher Name</label>
                   <input
                     type="text"
                     value={tName}
                     onChange={(e) => setTName(e.target.value)}
                     placeholder="e.g. Neelam Sen"
-                    className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-white border border-slate-200 rounded-lg py-2.5 px-3 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -300,14 +300,24 @@ export default function SetupWizard() {
                     value={tEmail}
                     onChange={(e) => setTEmail(e.target.value)}
                     placeholder="neelam@gmail.com"
-                    className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs text-slate-800 focus:outline-none"
+                    className="w-full bg-white border border-slate-200 rounded-lg py-2.5 px-3 text-xs text-slate-800 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mobile Number</label>
+                  <input
+                    type="tel"
+                    value={tMobile}
+                    onChange={(e) => setTMobile(e.target.value)}
+                    placeholder="9876543210"
+                    className="w-full bg-white border border-slate-200 rounded-lg py-2.5 px-3 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
                 <div>
                   <button
                     type="button"
                     onClick={handleAddTeacher}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-1 transition-all shadow-sm"
+                    className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-1 transition-all shadow-sm"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Staff
                   </button>

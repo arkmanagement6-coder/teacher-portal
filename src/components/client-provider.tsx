@@ -101,7 +101,7 @@ export function ClientProvider({ children }: { children: React.ReactNode }) {
             toast.type === 'error' ? 'bg-rose-500 shadow-[0_0_10px_#f43f5e]' : 
             'bg-violet-500 shadow-[0_0_10px_#8b5cf6]'
           }`} />
-          <p className="text-sm font-medium text-white">{toast.message}</p>
+          <p className="text-sm font-medium text-slate-800">{toast.message}</p>
         </div>
       )}
     </ClientContext.Provider>
