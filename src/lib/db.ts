@@ -1,7 +1,7 @@
 // Database abstraction layer supporting Supabase or LocalStorage Mock DB fallback.
 "use client";
 
-export type UserRole = 'super_admin' | 'owner' | 'teacher';
+export type UserRole = 'super_admin' | 'owner' | 'teacher' | 'employee';
 
 export interface Profile {
   id: string;
@@ -10,6 +10,19 @@ export interface Profile {
   mobile?: string;
   email: string;
   password?: string;
+  permissions?: string[]; // permissions list for employees
+}
+
+export interface Lead {
+  id: string;
+  academy_name: string;
+  contact_name: string;
+  email: string;
+  mobile: string;
+  status: 'new' | 'contacted' | 'demo_scheduled' | 'converted' | 'lost';
+  notes?: string;
+  assigned_to?: string;
+  created_at: string;
 }
 
 export interface Academy {
@@ -132,7 +145,8 @@ export interface SupportTicket {
 const MOCK_PROFILES: Profile[] = [
   { id: 'usr-admin', name: 'Super Admin', role: 'super_admin', email: 'admin@test.com', mobile: '9999900000', password: 'password123' },
   { id: 'usr-owner', name: 'Vikram Aditya', role: 'owner', email: 'owner@test.com', mobile: '9876543210', password: 'password123' },
-  { id: 'usr-teacher', name: 'Neelam Sen', role: 'teacher', email: 'teacher@test.com', mobile: '8765432109', password: 'password123' }
+  { id: 'usr-teacher', name: 'Neelam Sen', role: 'teacher', email: 'teacher@test.com', mobile: '8765432109', password: 'password123' },
+  { id: 'usr-employee', name: 'Rohan Verma', role: 'employee', email: 'staff@test.com', mobile: '7777700000', password: 'password123', permissions: ['manage_leads', 'view_academies', 'resolve_tickets'] }
 ];
 
 const MOCK_ACADEMIES: Academy[] = [
@@ -313,6 +327,12 @@ const MOCK_TICKETS: SupportTicket[] = [
   { id: 'tkt-2', academy_name: 'Harmony Music School', title: 'Need custom SMS configuration', description: 'Can we integrate custom SMS gateway instead of WhatsApp API?', status: 'resolved', created_at: '2026-06-18T09:15:00Z' }
 ];
 
+const MOCK_LEADS: Lead[] = [
+  { id: 'lead-1', academy_name: 'Bright Kids Play School', contact_name: 'Aditi Sharma', email: 'aditi@brightkids.com', mobile: '9876543220', status: 'new', notes: 'Interested in chess curriculum tracking', created_at: '2026-06-25T10:00:00Z' },
+  { id: 'lead-2', academy_name: 'Royal Chess Academy', contact_name: 'Karan Johar', email: 'karan@royalchess.com', mobile: '9876543221', status: 'demo_scheduled', notes: 'Demo presentation scheduled on coming Monday at 4 PM', assigned_to: 'usr-employee', created_at: '2026-06-24T11:30:00Z' },
+  { id: 'lead-3', academy_name: 'Elite Dance Studio', contact_name: 'Sonia Sen', email: 'sonia@elitedance.com', mobile: '9876543222', status: 'converted', notes: 'Converted to Growth Plan', assigned_to: 'usr-employee', created_at: '2026-06-20T15:20:00Z' }
+];
+
 // Helper to write to local storage
 const getStorageItem = <T>(key: string, defaultValue: T): T => {
   if (typeof window === 'undefined') return defaultValue;
@@ -342,9 +362,10 @@ export class DbClient {
     const attendance = getStorageItem<Attendance[]>('db_attendance', MOCK_ATTENDANCE);
     const logs = getStorageItem<WhatsAppLog[]>('db_whatsapp_logs', MOCK_WHATSAPP_LOGS);
     const tickets = getStorageItem<SupportTicket[]>('db_tickets', MOCK_TICKETS);
+    const leads = getStorageItem<Lead[]>('db_leads', MOCK_LEADS);
     const currentUser = getStorageItem<Profile | null>('db_current_user', null);
 
-    return { profiles, academies, batches, students, fees, payments, attendance, logs, tickets, currentUser };
+    return { profiles, academies, batches, students, fees, payments, attendance, logs, tickets, leads, currentUser };
   }
 
   public static saveStore(store: ReturnType<typeof DbClient.getStore>) {
@@ -357,6 +378,7 @@ export class DbClient {
     setStorageItem('db_attendance', store.attendance);
     setStorageItem('db_whatsapp_logs', store.logs);
     setStorageItem('db_tickets', store.tickets);
+    setStorageItem('db_leads', store.leads);
     setStorageItem('db_current_user', store.currentUser);
   }
 

@@ -34,6 +34,8 @@ export default function LoginPage() {
       }
     } else if (user.role === 'teacher') {
       router.push('/teacher');
+    } else if (user.role === 'employee') {
+      router.push('/employee');
     }
   };
 
@@ -154,11 +156,11 @@ export default function LoginPage() {
               <Sparkles className="w-3.5 h-3.5 text-orange-500" /> One-Click Demo Mode
             </div>
             
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 type="button"
                 onClick={() => handleMockLogin('owner@test.com')}
-                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] sm:text-xs font-medium flex flex-col items-center gap-1 transition-all"
+                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] font-medium flex flex-col items-center gap-1 transition-all"
               >
                 <span>Owner Portal</span>
                 <span className="text-[8px] text-orange-600">Vikram (Apex)</span>
@@ -167,16 +169,25 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => handleMockLogin('teacher@test.com')}
-                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] sm:text-xs font-medium flex flex-col items-center gap-1 transition-all"
+                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] font-medium flex flex-col items-center gap-1 transition-all"
               >
                 <span>Teacher Portal</span>
                 <span className="text-[8px] text-orange-600">Neelam Sen</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleMockLogin('staff@test.com')}
+                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] font-medium flex flex-col items-center gap-1 transition-all"
+              >
+                <span>Employee</span>
+                <span className="text-[8px] text-orange-600">Rohan Verma</span>
               </button>
               
               <button
                 type="button"
                 onClick={() => handleMockLogin('admin@test.com')}
-                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] sm:text-xs font-medium flex flex-col items-center gap-1 transition-all"
+                className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 p-2 rounded-xl text-[10px] font-medium flex flex-col items-center gap-1 transition-all"
               >
                 <span>Super Admin</span>
                 <span className="text-[8px] text-orange-600">Platform Mgr</span>
