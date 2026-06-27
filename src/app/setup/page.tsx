@@ -21,15 +21,13 @@ export default function SetupWizard() {
   const [logo, setLogo] = useState('');
 
   // Step 2: Add Teachers
-  const [teachers, setTeachers] = useState<{ name: string; email: string; mobile: string }[]>([
-    { name: 'Neelam Sen', email: 'neelam@academy.com', mobile: '9876543210' }
-  ]);
+  const [teachers, setTeachers] = useState<{ id?: string; name: string; email: string; mobile: string }[]>([]);
   const [tName, setTName] = useState('');
   const [tEmail, setTEmail] = useState('');
   const [tMobile, setTMobile] = useState('');
 
   // Step 3: Students Import
-  const [students, setStudents] = useState<Omit<Student, 'id' | 'academy_id' | 'created_at'>[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [csvText, setCsvText] = useState(
     "Name,Parent Name,Mobile,WhatsApp,Monthly Fee,Due Date\n" +
     "Aarav Sharma,Rajesh Sharma,9812345678,9812345678,1500,5\n" +
@@ -66,7 +64,7 @@ export default function SetupWizard() {
       router.push('/login');
       return;
     }
-    DbClient.getAcademy().then(acad => {
+    DbClient.getAcademy().then(async acad => {
       if (acad) {
         setAcademyId(acad.id);
         setName(acad.name || '');
@@ -77,6 +75,25 @@ export default function SetupWizard() {
         setWaPhoneId(acad.whatsapp_settings?.phoneNumberId || '');
         setWaToken(acad.whatsapp_settings?.accessToken || '');
         setWaEnabled(acad.whatsapp_enabled);
+
+        try {
+          const dbTeachers = await DbClient.getTeachers(acad.id);
+          if (dbTeachers && dbTeachers.length > 0) {
+            setTeachers(dbTeachers.map(t => ({
+              id: t.id,
+              name: t.name || '',
+              email: t.email || '',
+              mobile: t.mobile || ''
+            })));
+          }
+
+          const dbStudents = await DbClient.getStudents(acad.id);
+          if (dbStudents && dbStudents.length > 0) {
+            setStudents(dbStudents);
+          }
+        } catch (err) {
+          console.error("Failed to load existing roster details on refresh:", err);
+        }
       }
     });
   }, [user]);
@@ -88,21 +105,6 @@ export default function SetupWizard() {
         return;
       }
       await DbClient.updateAcademy(academyId, { name, address, logo_url: logo });
-    }
-
-    if (step === 2) {
-      for (const t of teachers) {
-        const existing = await DbClient.getTeachers(academyId);
-        if (!existing.some(ex => ex.email.toLowerCase() === t.email.toLowerCase())) {
-          await DbClient.addTeacher(academyId, t);
-        }
-      }
-    }
-
-    if (step === 3) {
-      for (const s of students) {
-        await DbClient.addStudent(academyId, s);
-      }
     }
 
     if (step === 4) {
@@ -130,43 +132,69 @@ export default function SetupWizard() {
     setStep(step - 1);
   };
 
-  const handleAddTeacher = () => {
+  const handleAddTeacher = async () => {
     if (!tName || !tEmail) {
       showToast('Teacher name and email are required', 'error');
       return;
     }
-    setTeachers([...teachers, { name: tName, email: tEmail, mobile: tMobile || 'N/A' }]);
-    setTName('');
-    setTEmail('');
-    setTMobile('');
+    if (teachers.some(t => t.email.toLowerCase() === tEmail.toLowerCase())) {
+      showToast('Teacher with this email already added', 'error');
+      return;
+    }
+
+    try {
+      const newT = await DbClient.addTeacher(academyId, { name: tName, email: tEmail, mobile: tMobile || 'N/A' });
+      setTeachers([...teachers, { id: newT.id, name: newT.name, email: newT.email, mobile: newT.mobile || 'N/A' }]);
+      setTName('');
+      setTEmail('');
+      setTMobile('');
+      showToast('Teacher added successfully!', 'success');
+    } catch (err) {
+      showToast('Failed to add teacher', 'error');
+    }
   };
 
-  const handleRemoveTeacher = (idx: number) => {
-    setTeachers(teachers.filter((_, i) => i !== idx));
+  const handleRemoveTeacher = async (idx: number) => {
+    const t = teachers[idx];
+    try {
+      if (t.id) {
+        await DbClient.deleteTeacher(t.id);
+      }
+      setTeachers(teachers.filter((_, i) => i !== idx));
+      showToast('Teacher removed successfully', 'success');
+    } catch (err) {
+      showToast('Failed to remove teacher', 'error');
+    }
   };
 
-  const handleAddStudent = () => {
+  const handleAddStudent = async () => {
     if (!sName || !sMobile) {
       showToast('Student name and mobile are required', 'error');
       return;
     }
-    setStudents([...students, {
-      name: sName,
-      parent_name: sParent || 'Parent',
-      mobile: sMobile,
-      whatsapp: sMobile,
-      email: sName.toLowerCase().replace(/\s+/g, '') + '@example.com',
-      monthly_fee: Number(sFee) || 1500,
-      due_date: Number(sDueDate) || 5,
-      joining_date: sJoiningDate || new Date().toISOString().split('T')[0],
-      status: 'active'
-    }]);
-    setSName('');
-    setSParent('');
-    setSMobile('');
-    setSFee('1500');
-    setSDueDate('5');
-    setSJoiningDate(new Date().toISOString().split('T')[0]);
+    try {
+      const newS = await DbClient.addStudent(academyId, {
+        name: sName,
+        parent_name: sParent || 'Parent',
+        mobile: sMobile,
+        whatsapp: sMobile,
+        email: sName.toLowerCase().replace(/\s+/g, '') + '@example.com',
+        monthly_fee: Number(sFee) || 1500,
+        due_date: Number(sDueDate) || 5,
+        joining_date: sJoiningDate || new Date().toISOString().split('T')[0],
+        status: 'active'
+      });
+      setStudents([...students, newS]);
+      setSName('');
+      setSParent('');
+      setSMobile('');
+      setSFee('1500');
+      setSDueDate('5');
+      setSJoiningDate(new Date().toISOString().split('T')[0]);
+      showToast('Student added successfully!', 'success');
+    } catch (err) {
+      showToast('Failed to add student', 'error');
+    }
   };
 
   const startEditingStudent = (index: number) => {
@@ -180,34 +208,58 @@ export default function SetupWizard() {
     setEditJoiningDate(std.joining_date || new Date().toISOString().split('T')[0]);
   };
 
-  const saveEditedStudent = (index: number) => {
+  const saveEditedStudent = async (index: number) => {
     if (!editName || !editMobile) {
       showToast('Name and Mobile are required for editing', 'error');
       return;
     }
-    const updated = [...students];
-    updated[index] = {
-      ...updated[index],
-      name: editName,
-      parent_name: editParent,
-      mobile: editMobile,
-      whatsapp: editMobile,
-      monthly_fee: Number(editFee) || 1500,
-      due_date: Number(editDueDate) || 5,
-      joining_date: editJoiningDate
-    };
-    setStudents(updated);
-    setEditingStudentIndex(null);
-    showToast('Student details updated successfully!', 'success');
+    const std = students[index];
+    try {
+      if (std.id) {
+        await DbClient.updateStudent(std.id, {
+          name: editName,
+          parent_name: editParent,
+          mobile: editMobile,
+          whatsapp: editMobile,
+          monthly_fee: Number(editFee) || 1500,
+          due_date: Number(editDueDate) || 5,
+          joining_date: editJoiningDate
+        });
+      }
+      const updated = [...students];
+      updated[index] = {
+        ...updated[index],
+        name: editName,
+        parent_name: editParent,
+        mobile: editMobile,
+        whatsapp: editMobile,
+        monthly_fee: Number(editFee) || 1500,
+        due_date: Number(editDueDate) || 5,
+        joining_date: editJoiningDate
+      };
+      setStudents(updated);
+      setEditingStudentIndex(null);
+      showToast('Student details updated successfully!', 'success');
+    } catch (err) {
+      showToast('Failed to save student edits', 'error');
+    }
   };
 
-  const deleteStudent = (index: number) => {
-    const updated = students.filter((_, i) => i !== index);
-    setStudents(updated);
-    showToast('Student removed from list', 'success');
+  const deleteStudent = async (index: number) => {
+    const std = students[index];
+    try {
+      if (std.id) {
+        await DbClient.deleteStudent(std.id);
+      }
+      const updated = students.filter((_, i) => i !== index);
+      setStudents(updated);
+      showToast('Student removed from list', 'success');
+    } catch (err) {
+      showToast('Failed to delete student', 'error');
+    }
   };
 
-  const handleParseCSV = () => {
+  const handleParseCSV = async () => {
     try {
       const lines = csvText.trim().split('\n');
       if (lines.length <= 1) {
@@ -232,8 +284,15 @@ export default function SetupWizard() {
           });
         }
       }
-      setStudents([...students, ...parsed]);
-      showToast(`Successfully parsed and added ${parsed.length} students!`, 'success');
+
+      const savedStudents = [];
+      for (const s of parsed) {
+        const newS = await DbClient.addStudent(academyId, s);
+        savedStudents.push(newS);
+      }
+
+      setStudents([...students, ...savedStudents]);
+      showToast(`Successfully saved ${savedStudents.length} students to database!`, 'success');
     } catch (err) {
       showToast('Error parsing CSV. Please check fields.', 'error');
     }

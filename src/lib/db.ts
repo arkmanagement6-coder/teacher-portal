@@ -449,6 +449,12 @@ export class DbClient {
     return newTeacher;
   }
 
+  static async deleteTeacher(teacherId: string): Promise<void> {
+    const store = this.getStore();
+    store.profiles = store.profiles.filter(p => p.id !== teacherId);
+    this.saveStore(store);
+  }
+
   // BATCHES API
   static async getBatches(academyId: string): Promise<Batch[]> {
     const store = this.getStore();
